@@ -1,10 +1,30 @@
 import { MutableRefObject, useRef, useState } from "react"
+import { useRecoilValue, useSetRecoilState } from "recoil"
+import { userState } from "../store/atom/conversationstate"
+import axios from "axios"
 
 const QuestionBox = () => {
     const [inputValue , setInputValue] = useState('')
     const inputRef = useRef() as MutableRefObject<HTMLInputElement>
+    const [loading,setLoading] = useState(false)
+    const setUserState = useSetRecoilState(userState)
+    const UserState = useRecoilValue(userState)
 
-    
+    const chat  = async() =>{
+        setUserState(
+          
+            [...UserState , {
+                role:'user',
+                parts:inputValue
+            }]
+        )
+        try {
+            const res = await axios.post('http://localhost:3000/chat',{question:inputValue})
+            console.log(res.data)
+        } catch (err) {
+            console.error(err)
+        }
+    }
     return (
         <>
             <div className="w-6 h-6 border-4 border-blue-300 rounded-full animate-spin border-t-white" />
@@ -50,7 +70,11 @@ const QuestionBox = () => {
                 </div>
                 <div className="ml-4">
                     <button
-                        className="flex items-center justify-center flex-shrink-0 px-4 py-1 text-white bg-indigo-500 hover:bg-indigo-600 rounded-xl"
+                        disabled={loading}
+                        onClick={()=>{
+                            chat()
+                        }}
+                        className="flex items-center justify-center flex-shrink-0 px-4 py-1 text-white bg-indigo-500 hover:bg-indigo-600 rounded-xl disabled:opacity-15 disabled:cursor-not-allowed"
                     >
                         <span>Send</span>
                         <span className="ml-2">

@@ -1,13 +1,22 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { APIKEY } from "./config";
 
-const genAI = new GoogleGenerativeAI(APIKEY)
+import express from 'express'
+import cors from 'cors'
 
-const run = async() => {
-    const model = genAI.getGenerativeModel({model:'gemini-pro'})
-    const prompt = "Write a story about a magic backpack."
-    const res = await model.generateContent(prompt)
-    const content = await res.response
-    console.log(content)
-}
-run()
+import  userChat from './route/userchat'
+
+
+const app = express()
+app.use(express.json())
+
+app.use(cors({
+    origin:'http://localhost:5173'
+}))
+
+app.use('/chat', userChat)
+
+
+
+
+app.listen(3000,()=>{
+    console.log('connected')
+})
